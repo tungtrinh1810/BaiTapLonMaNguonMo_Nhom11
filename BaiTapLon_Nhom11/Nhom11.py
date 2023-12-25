@@ -16,12 +16,15 @@ class ImageProcessingApp:
         self.filter_iterations = 0
         self.contrast = 1.0
         self.brightness = 0
-        self.current_contrast = 1.0
-        self.current_brightness = 0
+        self.angle = 0  # Góc xoay hiện tại
 
         # Tạo nút chọn ảnh
         choose_image_button = tk.Button(root, text="Chọn ảnh", command=self.choose_image)
         choose_image_button.pack(pady=20)
+
+        # Tạo nút áp dụng Median Filter
+        apply_median_filter_button = tk.Button(root, text="Áp dụng Median Filter", command=self.apply_median_filter)
+        apply_median_filter_button.pack(pady=20)
 
         # Tạo nút chức năng
         function_button = tk.Button(root, text="Chức năng", command=self.show_function_window)
@@ -56,19 +59,15 @@ class ImageProcessingApp:
         contrast_label = tk.Label(function_window, text="Độ Tương Phản")
         contrast_label.pack()
         contrast_scale = tk.Scale(function_window, from_=0.1, to=3.0, resolution=0.1, orient=tk.HORIZONTAL, command=self.adjust_contrast)
-        contrast_scale.set(self.current_contrast)
+        contrast_scale.set(self.contrast)
         contrast_scale.pack()
 
         # Tạo thanh trượt độ sáng
         brightness_label = tk.Label(function_window, text="Độ Sáng")
         brightness_label.pack()
         brightness_scale = tk.Scale(function_window, from_=-100, to=100, orient=tk.HORIZONTAL, command=self.adjust_brightness)
-        brightness_scale.set(self.current_brightness)
+        brightness_scale.set(self.brightness)
         brightness_scale.pack()
-
-        # Tạo nút áp dụng Median Filter trong cửa sổ chức năng
-        apply_median_filter_button = tk.Button(function_window, text="Áp dụng Median Filter", command=self.apply_median_filter)
-        apply_median_filter_button.pack(pady=10)
 
         # Tạo nút zoom ảnh
         zoom_button = tk.Button(function_window, text="Zoom ảnh", command=self.zoom_image)
@@ -91,46 +90,50 @@ class ImageProcessingApp:
         save_final_result_button.pack(pady=10)
 
     def zoom_image(self):
-        if self.current_img is not None:
+        if self.result_img is not None:
             zoom_factor = 1.5
-            self.current_img = cv2.resize(self.current_img, None, fx=zoom_factor, fy=zoom_factor, interpolation=cv2.INTER_LINEAR)
-            self.display_image(self.current_img)
+            resized_img = cv2.resize(self.result_img, None, fx=zoom_factor, fy=zoom_factor, interpolation=cv2.INTER_LINEAR)
+            self.display_image(resized_img)
 
     def rotate_image(self):
-        if self.current_img is not None:
-            rotated_img = cv2.rotate(self.current_img, cv2.ROTATE_90_CLOCKWISE)
-            self.current_img = rotated_img
+        if self.result_img is not None:
+            self.angle = (self.angle + 90) % 360
+            h, w, _ = self.result_img.shape
+            M = cv2.getRotationMatrix2D((w // 2, h // 2), self.angle, 1)
+            rotated_img = cv2.warpAffine(self.result_img, M, (w, h), flags=cv2.INTER_LINEAR)
+            self.current_img = rotated_img.copy()
             self.display_image(rotated_img)
 
     def flip_top(self):
-        if self.current_img is not None:
-            flipped_img = cv2.flip(self.current_img, 0)
-            self.current_img = flipped_img
+        if self.result_img is not None:
+            flipped_img = cv2.flip(self.result_img, 0)
+            self.current_img = flipped_img.copy()
             self.display_image(flipped_img)
 
     def flip_bottom(self):
-        if self.current_img is not None:
-            flipped_img = cv2.flip(self.current_img, 1)
-            self.current_img = flipped_img
+        if self.result_img is not None:
+            flipped_img = cv2.flip(self.result_img, 1)
+            self.current_img = flipped_img.copy()
             self.display_image(flipped_img)
 
     def adjust_contrast(self, value):
-        self.current_contrast = float(value)
+        self.contrast = float(value)
         if self.current_img is not None:
-            adjusted_img = cv2.convertScaleAbs(self.current_img, alpha=self.current_contrast, beta=self.current_brightness)
+            adjusted_img = cv2.convertScaleAbs(self.current_img, alpha=self.contrast, beta=self.brightness)
             self.display_image(adjusted_img)
 
     def adjust_brightness(self, value):
-        self.current_brightness = int(value)
+        self.brightness = int(value)
         if self.current_img is not None:
-            adjusted_img = cv2.convertScaleAbs(self.current_img, alpha=self.current_contrast, beta=self.current_brightness)
+            adjusted_img = cv2.convertScaleAbs(self.current_img, alpha=self.contrast, beta=self.brightness)
             self.display_image(adjusted_img)
 
     def save_final_result(self):
         if self.current_img is not None:
             file_path = filedialog.asksaveasfilename(defaultextension=".png", filetypes=[("PNG files", "*.png"), ("All files", "*.*")])
             if file_path:
-                cv2.imwrite(file_path, self.current_img)
+                adjusted_img = cv2.convertScaleAbs(self.current_img, alpha=self.contrast, beta=self.brightness)
+                cv2.imwrite(file_path, adjusted_img)
                 print(f"Kết quả cuối cùng đã được lưu tại: {file_path}")
 
     def display_image(self, image, text=""):
