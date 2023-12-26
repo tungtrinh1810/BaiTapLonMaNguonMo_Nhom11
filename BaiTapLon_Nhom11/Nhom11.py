@@ -1,8 +1,9 @@
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 from PIL import Image, ImageTk
 import numpy as np
 import cv2
+import os
 
 class ImageProcessingApp:
     def __init__(self, root):
@@ -37,12 +38,21 @@ class ImageProcessingApp:
     def choose_image(self):
         file_path = filedialog.askopenfilename()
         if file_path:
-            self.original_img = cv2.imread(file_path)
-            self.processed_img = self.original_img.copy()
-            self.result_img = self.original_img.copy()
-            self.current_img = self.original_img.copy()
-            self.filter_iterations = 0
-            self.display_image(self.original_img)
+            _, file_extension = os.path.splitext(file_path)
+            if file_extension.lower() == '.png':
+                self.original_img = cv2.imread(file_path)
+                if self.original_img is not None:
+                    self.processed_img = self.original_img.copy()
+                    self.result_img = self.original_img.copy()
+                    self.current_img = self.original_img.copy()
+                    self.filter_iterations = 0
+                    self.display_image(self.original_img)
+                else:
+                    # Hiển thị thông báo khi không thể đọc ảnh
+                    messagebox.showerror("Lỗi", "Không thể đọc ảnh. Vui lòng chọn lại.")
+            else:
+                # Hiển thị thông báo khi chọn file không phải là PNG
+                messagebox.showinfo("Thông báo", "Vui lòng chọn một file ảnh có đuôi là PNG.")
 
     def apply_median_filter(self):
         if self.processed_img is not None:
@@ -50,44 +60,49 @@ class ImageProcessingApp:
             self.filter_iterations += 1
             self.current_img = self.result_img.copy()
             self.display_image(self.result_img, text=f"Iteration: {self.filter_iterations}")
+        else:
+            # Hiển thị thông báo khi chưa chọn ảnh
+            messagebox.showinfo("Thông báo", "Vui lòng chọn ảnh trước khi áp dụng Median Filter.")
 
     def show_function_window(self):
-        function_window = tk.Toplevel(self.root)
-        function_window.title("Chức năng")
 
-        # Tạo thanh trượt độ tương phản
-        contrast_label = tk.Label(function_window, text="Độ Tương Phản")
-        contrast_label.pack()
-        contrast_scale = tk.Scale(function_window, from_=0.1, to=3.0, resolution=0.1, orient=tk.HORIZONTAL, command=self.adjust_contrast)
-        contrast_scale.set(self.contrast)
-        contrast_scale.pack()
+        if self.original_img is not None:
+            function_window = tk.Toplevel(self.root)
+            function_window.title("Chức năng")
 
-        # Tạo thanh trượt độ sáng
-        brightness_label = tk.Label(function_window, text="Độ Sáng")
-        brightness_label.pack()
-        brightness_scale = tk.Scale(function_window, from_=-100, to=100, orient=tk.HORIZONTAL, command=self.adjust_brightness)
-        brightness_scale.set(self.brightness)
-        brightness_scale.pack()
+            # Tạo nút xoay ảnh
+            rotate_button = tk.Button(function_window, text="Xoay ảnh", command=self.rotate_image)
+            rotate_button.pack(pady=10)
 
-        # Tạo nút zoom ảnh
-        zoom_button = tk.Button(function_window, text="Zoom ảnh", command=self.zoom_image)
-        zoom_button.pack(pady=10)
+            # Tạo nút lật trên
+            flip_top_button = tk.Button(function_window, text="Lật trên", command=self.flip_top)
+            flip_top_button.pack(pady=10)
 
-        # Tạo nút xoay ảnh
-        rotate_button = tk.Button(function_window, text="Xoay ảnh", command=self.rotate_image)
-        rotate_button.pack(pady=10)
+            # Tạo nút lật dưới
+            flip_bottom_button = tk.Button(function_window, text="Lật dưới", command=self.flip_bottom)
+            flip_bottom_button.pack(pady=10)
 
-        # Tạo nút lật trên
-        flip_top_button = tk.Button(function_window, text="Lật trên", command=self.flip_top)
-        flip_top_button.pack(pady=10)
+            # Tạo thanh trượt độ tương phản
+            contrast_label = tk.Label(function_window, text="Độ Tương Phản")
+            contrast_label.pack()
+            contrast_scale = tk.Scale(function_window, from_=0.1, to=3.0, resolution=0.1, orient=tk.HORIZONTAL, command=self.adjust_contrast)
+            contrast_scale.set(self.contrast)
+            contrast_scale.pack()
 
-        # Tạo nút lật dưới
-        flip_bottom_button = tk.Button(function_window, text="Lật dưới", command=self.flip_bottom)
-        flip_bottom_button.pack(pady=10)
+            # Tạo thanh trượt độ sáng
+            brightness_label = tk.Label(function_window, text="Độ Sáng")
+            brightness_label.pack()
+            brightness_scale = tk.Scale(function_window, from_=-100, to=100, orient=tk.HORIZONTAL, command=self.adjust_brightness)
+            brightness_scale.set(self.brightness)
+            brightness_scale.pack()
 
-        # Tạo nút lưu kết quả cuối cùng
-        save_final_result_button = tk.Button(function_window, text="Lưu kết quả cuối cùng", command=self.save_final_result)
-        save_final_result_button.pack(pady=10)
+            # Tạo nút lưu kết quả cuối cùng
+            save_final_result_button = tk.Button(function_window, text="Lưu kết quả cuối cùng", command=self.save_final_result)
+            save_final_result_button.pack(pady=10)
+
+        else:
+            # Hiển thị thông báo khi chưa chọn ảnh
+            messagebox.showinfo("Thông báo", "Vui lòng chọn ảnh trước khi sử dụng chức năng.")
 
     def zoom_image(self):
         if self.result_img is not None:
@@ -171,6 +186,7 @@ def median_filter(data, filter_size):
 
 def main():
     root = tk.Tk()
+    root.attributes("-topmost", True)
     app = ImageProcessingApp(root)
     root.mainloop()
 
