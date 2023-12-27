@@ -8,7 +8,7 @@ import os
 class ImageProcessingApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Image Processing App")
+        self.root.title("Giao dien xu li anh")
 
         self.original_img = None
         self.processed_img = None
@@ -17,21 +17,21 @@ class ImageProcessingApp:
         self.filter_iterations = 0
         self.contrast = 1.0
         self.brightness = 0
-        self.angle = 0  # Góc xoay hiện tại
+        self.angle = 0
 
-        # Tạo nút chọn ảnh
+
         choose_image_button = tk.Button(root, text="Chọn ảnh", command=self.choose_image)
         choose_image_button.pack(pady=20)
 
-        # Tạo nút áp dụng Median Filter
+
         apply_median_filter_button = tk.Button(root, text="Áp dụng Median Filter", command=self.apply_median_filter)
         apply_median_filter_button.pack(pady=20)
 
-        # Tạo nút chức năng
+
         function_button = tk.Button(root, text="Chức năng", command=self.show_function_window)
         function_button.pack(pady=20)
 
-        # Tạo panel để hiển thị ảnh
+
         self.panel = tk.Label(self.root)
         self.panel.pack()
 
@@ -39,7 +39,7 @@ class ImageProcessingApp:
         file_path = filedialog.askopenfilename()
         if file_path:
             _, file_extension = os.path.splitext(file_path)
-            if file_extension.lower() == '.png':
+            if file_extension.lower() in ('.png', '.jpg' ):
                 self.original_img = cv2.imread(file_path)
                 if self.original_img is not None:
                     self.processed_img = self.original_img.copy()
@@ -47,12 +47,9 @@ class ImageProcessingApp:
                     self.current_img = self.original_img.copy()
                     self.filter_iterations = 0
                     self.display_image(self.original_img)
-                else:
-                    # Hiển thị thông báo khi không thể đọc ảnh
-                    messagebox.showerror("Lỗi", "Không thể đọc ảnh. Vui lòng chọn lại.")
             else:
-                # Hiển thị thông báo khi chọn file không phải là PNG
-                messagebox.showinfo("Thông báo", "Vui lòng chọn một file ảnh có đuôi là PNG.")
+
+                messagebox.showinfo("Thông báo", "Vui lòng chọn một file có đuôi là PNG hoặc JPG.")
 
     def apply_median_filter(self):
         if self.processed_img is not None:
@@ -61,7 +58,7 @@ class ImageProcessingApp:
             self.current_img = self.result_img.copy()
             self.display_image(self.result_img, text=f"Iteration: {self.filter_iterations}")
         else:
-            # Hiển thị thông báo khi chưa chọn ảnh
+
             messagebox.showinfo("Thông báo", "Vui lòng chọn ảnh trước khi áp dụng Median Filter.")
 
     def show_function_window(self):
@@ -74,12 +71,12 @@ class ImageProcessingApp:
             rotate_button = tk.Button(function_window, text="Xoay ảnh", command=self.rotate_image)
             rotate_button.pack(pady=10)
 
-            # Tạo nút lật trên
-            flip_top_button = tk.Button(function_window, text="Lật trên", command=self.flip_top)
+            # Tạo nút lật trên dưới
+            flip_top_button = tk.Button(function_window, text="Lật trên dưới", command=self.flip_top)
             flip_top_button.pack(pady=10)
 
-            # Tạo nút lật dưới
-            flip_bottom_button = tk.Button(function_window, text="Lật dưới", command=self.flip_bottom)
+            # Tạo nút lật trái phải
+            flip_bottom_button = tk.Button(function_window, text="Lật trái phải", command=self.flip_bottom)
             flip_bottom_button.pack(pady=10)
 
             # Tạo thanh trượt độ tương phản
@@ -101,14 +98,8 @@ class ImageProcessingApp:
             save_final_result_button.pack(pady=10)
 
         else:
-            # Hiển thị thông báo khi chưa chọn ảnh
             messagebox.showinfo("Thông báo", "Vui lòng chọn ảnh trước khi sử dụng chức năng.")
 
-    def zoom_image(self):
-        if self.result_img is not None:
-            zoom_factor = 1.5
-            resized_img = cv2.resize(self.result_img, None, fx=zoom_factor, fy=zoom_factor, interpolation=cv2.INTER_LINEAR)
-            self.display_image(resized_img)
 
     def rotate_image(self):
         if self.result_img is not None:
@@ -121,13 +112,13 @@ class ImageProcessingApp:
 
     def flip_top(self):
         if self.result_img is not None:
-            flipped_img = cv2.flip(self.result_img, 0)
+            flipped_img = cv2.flip(self.current_img, 0)
             self.current_img = flipped_img.copy()
             self.display_image(flipped_img)
 
     def flip_bottom(self):
         if self.result_img is not None:
-            flipped_img = cv2.flip(self.result_img, 1)
+            flipped_img = cv2.flip(self.current_img, 1)
             self.current_img = flipped_img.copy()
             self.display_image(flipped_img)
 
@@ -137,11 +128,13 @@ class ImageProcessingApp:
             adjusted_img = cv2.convertScaleAbs(self.current_img, alpha=self.contrast, beta=self.brightness)
             self.display_image(adjusted_img)
 
+
     def adjust_brightness(self, value):
         self.brightness = int(value)
         if self.current_img is not None:
             adjusted_img = cv2.convertScaleAbs(self.current_img, alpha=self.contrast, beta=self.brightness)
             self.display_image(adjusted_img)
+
 
     def save_final_result(self):
         if self.current_img is not None:
@@ -152,7 +145,7 @@ class ImageProcessingApp:
                 print(f"Kết quả cuối cùng đã được lưu tại: {file_path}")
 
     def display_image(self, image, text=""):
-        image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image_rgb = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
         img_pil = Image.fromarray(image_rgb)
         img_tk = ImageTk.PhotoImage(img_pil)
         self.panel.configure(image=img_tk)
