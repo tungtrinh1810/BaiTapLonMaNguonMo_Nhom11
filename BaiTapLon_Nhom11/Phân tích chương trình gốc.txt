@@ -1,5 +1,6 @@
-Phân tích chương trình gốc
+Phân tích chương trình gốc:
+Ứng dụng được phát triển dựa trên mã nguồn: https://github.com/MeteHanC/Python-Median-Filter.git
 Chương trình Python thực hiện một phương pháp làm mịn hình ảnh được gọi là bộ lọc trung bình (median filter).
-Bộ lọc này được sử dụng để giảm thiểu hiệu ứng nhiễu trên hình ảnh xám.
-Chương trình sử dụng thư viện numpy cho các phép toán trên mảng và ma trận, cũng như Image từ thư viện PIL 
-để xử lý hình ảnh.
+Thuật toán này sử dụng cửa sổ lân cận để lấy giá trị pixel xung quanh mỗi pixel, sau đó sắp xếp các giá trị vào 
+trong mảng rỗng được tạo ban đầu và chọn giá trị trung bình làm giá trị mới cho pixel đó. Điều này giúp làm mờ
+ảnh và loại bỏ nhiễu trong quá trình xử lý ảnh.
