@@ -1,0 +1,5 @@
+Phân tích chương trình gốc
+Chương trình Python thực hiện một phương pháp làm mịn hình ảnh được gọi là bộ lọc trung bình (median filter).
+Bộ lọc này được sử dụng để giảm thiểu hiệu ứng nhiễu trên hình ảnh xám.
+Chương trình sử dụng thư viện numpy cho các phép toán trên mảng và ma trận, cũng như Image từ thư viện PIL 
+để xử lý hình ảnh.

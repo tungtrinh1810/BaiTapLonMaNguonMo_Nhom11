@@ -1,0 +1,18 @@
+Ý tưởng phát triển thuật toán: Ý tưởng của đoạn mã này là tạo ra một ứng dụng đơn giản sử dụng 
+thư viện Tkinter để xử lý ảnh. Ứng dụng cho phép người dùng thực hiện các thao tác xử lý ảnh cơ
+bản như chọn ảnh, áp dụng bộ lọc trung vị, xoay ảnh, lật ảnh, điều chỉnh độ tương phản và độ sáng,
+sau đó lưu kết quả. Ngoài ra còn có thể bẫy được các tình huống người dùng nhập sai dữ liệu.
+Dưới đây là các chức năng chính của ứng dụng:
+1. Chọn ảnh:
+   - Người dùng có thể chọn một file ảnh (đuôi là PNG hoặc JPG).
+   - Nếu file có đuôi hợp lệ, ảnh sẽ được hiển thị trên giao diện và lưu vào các biến.
+Ngược lại, giao diện sẽ hiện hộp thoại thông báo chọn lại.
+2. Áp dụng Median Filter:
+   - Khi ảnh đã được chọn, người dùng có thể áp dụng bộ lọc trung vị lên ảnh.
+3. Chức năng:
+   - Mở một cửa sổ chức năng để thực hiện các thao tác như xoay ảnh, lật ảnh, điều chỉnh độ tương phản và
+độ sáng.
+   - Kết quả của mọi thao tác sẽ được hiển thị ngay trên giao diện.
+   - Các nút trong cửa sổ chức năng cho phép người dùng xoay ảnh, lật ảnh theo chiều dọc và chiều ngang.
+   - Sử dụng thanh trượt để điều chỉnh độ tương phản và độ sáng của ảnh.
+   - Người dùng có thể lưu ảnh sau khi áp dụng các thao tác xử lý và điều chỉnh.
